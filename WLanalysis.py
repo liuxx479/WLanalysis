@@ -575,26 +575,17 @@ def azimuthalAverage3D(grid, edges = None, logbins = True, bins = 50, return_num
         return edges[1:], radial_prof
     
 def PowerSpectrum3D(grid, logbins = True, bins=50):#edges should be pixels
-    '''Calculate the power spectrum for a square image, with normalization.
+    '''Calculate the power spectrum for a cube.
     Input:
-    img = input square image in numpy array.
-    sizedeg = image real size in deg^2
-    edges = ell bin edges, length = nbin + 1, if not provided, then do 1000 bins.
-    sigmaG = smoothing scale in arcmin
+    grid = input grid in numpy array.
     Output:
-    powspec = the power at the bins
-    ell_arr = lower bound of the binedges
-    '''
+    k, psd1D'''
     isize = grid.shape[0]
-    #F = fftpack.fftshift(fftpack.fft2(img))
     F = fftshift(fftpack.fftn(grid))
     psd3D = np.abs(F)**2
 
     k_arr, psd1D = azimuthalAverage3D(psd3D, logbins = logbins, bins=bins)
     k_arr = edge2center(k_arr)
-    #ell_arr *= 360./sqrt(sizedeg)# normalized to our current map size
-    #norm = ((2*pi*sqrt(sizedeg)/360.0)**2)/(size**2)**2
-    #powspec = ell_arr*(ell_arr+1)/(2*pi) * norm * psd1D
     return k_arr, psd1D
 
 def PowerSpectrum(img, sizedeg = 12.25, edges = None, logbins = True, sigmaG=0, bins=50):#edges should be pixels
