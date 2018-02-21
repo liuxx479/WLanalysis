@@ -588,6 +588,21 @@ def PowerSpectrum3D(grid, logbins = True, bins=50):#edges should be pixels
     k_arr = edge2center(k_arr)
     return k_arr, psd1D
 
+def CrossPowerSpectrum3D(grid1, grid2, logbins = True, bins=50):#edges should be pixels
+    '''Calculate the cross power spectrum for 2 cubes.
+    Input:
+    grid1, grid2 = input grid in numpy array.
+    Output:
+    k, psd1D'''
+    isize = grid.shape[0]
+    F1 = fftshift(fftpack.fftn(grid1))
+    F2 = fftshift(fftpack.fftn(grid2))
+    psd3D = np.conj(F1)*F2#np.abs(F)**2
+
+    k_arr, psd1D = azimuthalAverage3D(psd3D, logbins = logbins, bins=bins)
+    k_arr = edge2center(k_arr)
+    return k_arr, psd1D
+
 def PowerSpectrum(img, sizedeg = 12.25, edges = None, logbins = True, sigmaG=0, bins=50):#edges should be pixels
     '''Calculate the power spectrum for a square image, with normalization.
     Input:
@@ -947,7 +962,7 @@ def prob_plane (chisq_fcn, param1_arr, param2_arr):
         for j in range(len(param2_arr)):
             heatmap[i,j] = chisq_fcn(param1_arr[i], param2_arr[j])
     prob = exp(-0.5*heatmap)
-    prob /= sum(prob[~isnan(prob)])
+    prob /= sum(prob[~isnan(prob)]) 
     return heatmap, prob
 
 def corr_mat (cov_mat):
