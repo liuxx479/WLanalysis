@@ -594,7 +594,7 @@ def CrossPowerSpectrum3D(grid1, grid2, logbins = True, bins=50):#edges should be
     grid1, grid2 = input grid in numpy array.
     Output:
     k, psd1D'''
-    isize = grid.shape[0]
+    isize = grid1.shape[0]
     F1 = fftshift(fftpack.fftn(grid1))
     F2 = fftshift(fftpack.fftn(grid2))
     psd3D = np.conj(F1)*F2#np.abs(F)**2
