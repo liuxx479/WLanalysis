@@ -776,7 +776,7 @@ def findlevel (iH, isum=0):
     return V = [v68, v95, v99]
     '''
     if isum:
-        H = iH/isum
+        H = iH/(isum*1.0)
     else:
         H = iH/(1.0*sum(iH))
     H[isnan(H)]=0.0
