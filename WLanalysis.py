@@ -771,13 +771,15 @@ def buildInterpolator2D(obs_arr, cosmo_params, method='Rbf'):
         return ps_interp
     return interp_cosmo
 
-def findlevel (H):
+def findlevel (iH, isum=0):
     '''Find 68%, 95%, 99% confidence level for a probability 2D plane H.
     return V = [v68, v95, v99]
     '''
-    H /= sum(H)
-    H /= float(sum(H))
-    H[isnan(H)]=0
+    if isum:
+        H = iH/isum
+    else:
+        H = iH/(1.0*sum(iH))
+    H[isnan(H)]=0.0
     
     idx = np.argsort(H.flat)[::-1]
     H_sorted = H.flat[idx]
