@@ -775,10 +775,9 @@ def findlevel (iH, isum=0):
     '''Find 68%, 95%, 99% confidence level for a probability 2D plane H.
     return V = [v68, v95, v99]
     '''
-    if isum:
-        H = iH/(isum*1.0)
-    else:
-        H = iH/(1.0*sum(iH))
+    if isum == 0 :
+        isum = sum(iH))
+    H = iH/isum
     H[isnan(H)]=0.0
     
     idx = np.argsort(H.flat)[::-1]
@@ -790,7 +789,7 @@ def findlevel (iH, isum=0):
     v68 = float(H.flat[idx[idx68]])
     v95 = float(H.flat[idx[idx95]])
     v99 = float(H.flat[idx[idx99]])
-    V = [v68, v95, v99]
+    V = array([v68, v95, v99])*isum
     return V
 
 def update_values_by_RaDec (new_ra, new_dec, master_ra, master_dec):
