@@ -705,7 +705,7 @@ def create_dir_if_nonexist(dirname):
         pass
 
 ######### begin: build interpolator ###############
-def buildInterpolator(obs_arr, cosmo_params):
+def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0):
     '''Build an interpolator:
     input:
     obs_arr = (points, Nbin), where # of points = # of models
@@ -720,7 +720,7 @@ def buildInterpolator(obs_arr, cosmo_params):
     spline_interps = list()
     for ibin in range(obs_arr.shape[-1]):
         model = obs_arr[:,ibin]
-        iinterp = interpolate.Rbf(m, w, s, model)
+        iinterp = interpolate.Rbf(m, w, s, model, function=function, smooth=smooth)
         spline_interps.append(iinterp)
     #return spline_interps
     def interp_cosmo (params):
@@ -783,9 +783,9 @@ def findlevel (iH, isum=0):
     idx = np.argsort(H.flat)[::-1]
     H_sorted = H.flat[idx]
     H_cumsum = np.cumsum(H_sorted)
-    idx68 = where(abs(H_cumsum-0.683)==amin(abs(H_cumsum-0.683)))[0]    
-    idx95 = where(abs(H_cumsum-0.955)==amin(abs(H_cumsum-0.955)))[0]
-    idx99 = where(abs(H_cumsum-0.997)==amin(abs(H_cumsum-0.997)))[0]
+    idx68 = where(abs(H_cumsum-0.683)==amin(abs(H_cumsum-0.683)))[0][0]    
+    idx95 = where(abs(H_cumsum-0.955)==amin(abs(H_cumsum-0.955)))[0][0]
+    idx99 = where(abs(H_cumsum-0.997)==amin(abs(H_cumsum-0.997)))[0][0]
     v68 = float(H.flat[idx[idx68]])
     v95 = float(H.flat[idx[idx95]])
     v99 = float(H.flat[idx[idx99]])
