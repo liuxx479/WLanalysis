@@ -14,6 +14,8 @@ import astropy.io.fits as pyfits
 #import pyfits
 import KSI
 from random import gauss
+from sklearn import gaussian_process
+from sklearn.gaussian_process import GaussianProcess
 
 ###################################
 #### CFHT list of redshifts
@@ -705,7 +707,7 @@ def create_dir_if_nonexist(dirname):
         pass
 
 ######### begin: build interpolator ###############
-def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0):
+def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0, regr='linear', corr='cubic'):
     '''Build an interpolator:
     input:
     obs_arr = (points, Nbin), where # of points = # of models
@@ -716,24 +718,32 @@ def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0
     Usage:
     spline_interps[ibin](im, wm, sm)
     '''
-    m, w, s = cosmo_params.T
-    spline_interps = list()
-    for ibin in range(obs_arr.shape[-1]):
-        model = obs_arr[:,ibin]
-        iinterp = interpolate.Rbf(m, w, s, model, function=function, smooth=smooth)
-        spline_interps.append(iinterp)
-    #return spline_interps
-    def interp_cosmo (params):
-        '''Interpolate the powspec for certain param.
-        Params: list of 3 parameters = (om, w, si8)
-        Method: "multiquadric" for spline (default), and "GP" for Gaussian process.
-        '''
-        mm, wm, sm = params
-        gen_ps = lambda ibin: spline_interps[ibin](mm, wm, sm)
-        ps_interp = array(map(gen_ps, range(obs_arr.shape[-1])))
-        ps_interp = ps_interp.reshape(-1,1).squeeze()
-        return ps_interp
-    return interp_cosmo
+    if function = 'GP':
+        gp = GaussianProcess(regr=regr, corr=corr, theta0=1e-2, thetaL=1e-4, thetaU=1e-1, random_start=100)
+        gp.fit(cosmo_params,obs_arr)
+        out = lambda x: (gp.predict(x.reshape(1,-1))).flatten() 
+        return out
+    
+    else:
+        m, w, s = cosmo_params.T
+        spline_interps = list()
+        for ibin in range(obs_arr.shape[-1]):
+            model = obs_arr[:,ibin]
+            iinterp = interpolate.Rbf(m, w, s, model, function=function, smooth=smooth)
+            spline_interps.append(iinterp)
+        #return spline_interps
+        def interp_cosmo (params):
+            '''Interpolate the powspec for certain param.
+            Params: list of 3 parameters = (om, w, si8)
+            Method: "multiquadric" for spline (default), and "GP" for Gaussian process.
+            '''
+            mm, wm, sm = params
+            gen_ps = lambda ibin: spline_interps[ibin](mm, wm, sm)
+            ps_interp = array(map(gen_ps, range(obs_arr.shape[-1])))
+            ps_interp = ps_interp.reshape(-1,1).squeeze()
+            return ps_interp
+        return interp_cosmo
+
 
 def buildInterpolator2D(obs_arr, cosmo_params, method='Rbf'):
     '''Build an interpolator:
