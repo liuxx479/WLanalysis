@@ -707,7 +707,7 @@ def create_dir_if_nonexist(dirname):
         pass
 
 ######### begin: build interpolator ###############
-def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0)#, regr='linear', corr='cubic'):
+def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0):#, regr='linear', corr='cubic'):
     '''Build an interpolator:
     input:
     obs_arr = (points, Nbin), where # of points = # of models
