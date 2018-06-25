@@ -707,7 +707,7 @@ def create_dir_if_nonexist(dirname):
         pass
 
 ######### begin: build interpolator ###############
-def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0, regr='linear', corr='cubic'):
+def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0.0)#, regr='linear', corr='cubic'):
     '''Build an interpolator:
     input:
     obs_arr = (points, Nbin), where # of points = # of models
@@ -719,7 +719,7 @@ def buildInterpolator(obs_arr, cosmo_params, function = 'multiquadric', smooth=0
     spline_interps[ibin](im, wm, sm)
     '''
     if function == 'GP':
-        gp = GaussianProcess(regr=regr, corr=corr, theta0=1e-2, thetaL=1e-4, thetaU=1e-1, random_start=100)
+        gp = GaussianProcess(theta0=1e-2, thetaL=1e-4, thetaU=1e-1, random_start=100)
         gp.fit(cosmo_params,obs_arr)
         out = lambda x: (gp.predict(x.reshape(1,-1))).flatten() 
         return out
